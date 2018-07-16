@@ -1,5 +1,5 @@
 {
-  "name": "app-verk/api-test-cases",
+  "name": "soft-passio/api-test-cases",
   "description": "Test cases for boost up writing PHPUnit tests for API with Symfony 3 framework",
   "type": "symfony-bundle",
   "authors": [
@@ -34,7 +34,7 @@
 
   "autoload": {
     "psr-4": {
-      "AppVerk\\ApiTestCasesBundle\\": ""
+      "SoftPassio\\ApiTestCasesBundle\\": ""
     }
   }
 }
