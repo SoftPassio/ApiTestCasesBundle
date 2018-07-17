@@ -22,7 +22,7 @@
     "sensio/framework-extra-bundle": ">=2.8",
     "doctrine/doctrine-bundle": "^1.6",
     "doctrine/orm": "^2.5",
-    "coduo/php-matcher": "^2.1",
+    "coduo/php-matcher": "^3.1",
     "doctrine/data-fixtures": "^1.2",
     "guzzlehttp/guzzle": "^5.0",
     "hautelook/alice-bundle": "^1.4",
