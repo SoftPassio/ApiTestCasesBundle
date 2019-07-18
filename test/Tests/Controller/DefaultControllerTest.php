@@ -1,8 +1,8 @@
 <?php
 
-namespace AppVerk\ApiTestCasesBundle\test\Tests\Controller;
+namespace SoftPassio\ApiTestCasesBundle\test\Tests\Controller;
 
-use AppVerk\ApiTestCasesBundle\Api\Cases\JsonApiTestCase;
+use SoftPassio\ApiTestCasesBundle\Api\Cases\JsonApiTestCase;
 use Symfony\Component\HttpFoundation\Response;
 
 class DefaultControllerTest extends JsonApiTestCase

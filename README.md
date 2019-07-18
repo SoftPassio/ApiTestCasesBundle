@@ -1,5 +1,4 @@
 # ApiTestCasesBundle
-[![Build Status](https://travis-ci.org/AppVerk/ApiTestCasesBundle.svg?branch=master)](https://travis-ci.org/AppVerk/ApiTestCasesBundle)
 
 Test cases for boost up writing PHPUnit functional tests for API with Symfony framework.
 Bundle is helping you debuging failed tests and bosting TDD process.
@@ -36,7 +35,7 @@ Bundle is helping you debuging failed tests and bosting TDD process.
 
 All you need to do is extend JsonApiTestCase in your functional controller class.
 
-    use AppVerk\ApiTestCasesBundle\Api\Cases\JsonApiTestCase;
+    use SoftPassio\ApiTestCasesBundle\Api\Cases\JsonApiTestCase;
     use Symfony\Component\HttpFoundation\Response;
     
     class ProfileControllerTest extends JsonApiTestCase
@@ -89,7 +88,3 @@ All you need to do is extend JsonApiTestCase in your functional controller class
     security:
     encoders:
         AppBundle\Entity\User: plaintext
-        
-## More examples
-
-for more examples please visit https://github.com/AppVerk/BaseApi/tree/master/src/Bundle/ApiBundle/Tests

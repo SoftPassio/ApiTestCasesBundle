@@ -1,6 +1,6 @@
 <?php
 
-namespace AppVerk\ApiTestCasesBundle\Api\Cases;
+namespace SoftPassio\ApiTestCasesBundle\Api\Cases;
 
 use Coduo\PHPMatcher\Matcher;
 use Doctrine\Common\DataFixtures\Purger\ORMPurger;

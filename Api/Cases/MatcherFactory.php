@@ -1,6 +1,6 @@
 <?php
 
-namespace AppVerk\ApiTestCasesBundle\Api\Cases;
+namespace SoftPassio\ApiTestCasesBundle\Api\Cases;
 
 use Coduo\PHPMatcher\Lexer;
 use Coduo\PHPMatcher\Matcher;

@@ -6,6 +6,10 @@
     {
       "name": "Michał Jędraszczyk",
       "email": "m.jedrasz@gmail.com"
+    },
+    {
+      "name": "Rafał Narowski",
+      "email": "rafal.narowski@o2.pl"
     }
   ],
   "keywords": [
@@ -33,7 +37,7 @@
 
   "autoload": {
     "psr-4": {
-      "AppVerk\\ApiTestCasesBundle\\": ""
+      "SoftPassio\\ApiTestCasesBundle\\": ""
     }
   }
 }

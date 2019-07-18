@@ -1,6 +1,6 @@
 <?php
 
-namespace AppVerk\ApiTestCasesBundle\Api\Cases;
+namespace SoftPassio\ApiTestCasesBundle\Api\Cases;
 
 use Symfony\Component\HttpFoundation\Response;
 
