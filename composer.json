@@ -27,7 +27,7 @@
     "symfony/symfony": "^3.4||^4.4",
     "sensio/framework-extra-bundle": "^3.4||^5.0.0",
     "coduo/php-matcher": "*",
-    "hautelook/alice-bundle": "^2.7",
+    "hautelook/alice-bundle": "2.1",
     "phpspec/php-diff": "^1.1",
     "phpunit/phpunit": "8.0",
     "symfony/phpunit-bridge": "*"

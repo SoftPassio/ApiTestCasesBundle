@@ -2,10 +2,15 @@
 
 namespace SoftPassio\ApiTestCasesBundle\Api\Cases;
 
+use Coduo\PHPMatcher\PHPUnit\PHPMatcherAssertions;
+use Coduo\PHPMatcher\Factory\MatcherFactory;
 use Symfony\Component\HttpFoundation\Response;
+use Coduo\PHPMatcher\PHPMatcher;
 
 trait ExtraAssertsTrait
 {
+    use PHPMatcherAssertions;
+
     /**
      * @param Response $response
      * @param int $statusCode
@@ -28,14 +33,6 @@ trait ExtraAssertsTrait
         $this->assertResponseCode($response, $statusCode);
         $this->assertJsonHeader($response, $statusCode);
         $this->assertJsonResponseContent($response, $filename);
-    }
-
-    /**
-     * @param int $statusCode
-     */
-    protected function assertResponseCode(Response $response, $statusCode)
-    {
-        self::assertEquals($statusCode, $response->getStatusCode());
     }
 
     protected function assertJsonHeader(Response $response, $statusCode)
@@ -67,15 +64,20 @@ trait ExtraAssertsTrait
     protected function assertResponseContent($actualResponse, $filename, $mimeType)
     {
         $responseSource = $this->getExpectedResponsesFolder();
-        $actualResponse = trim($actualResponse);
-        $expectedResponse = trim(
+        $actualResponse = $this->prettifyJson(trim($actualResponse));
+        $expectedResponse = $this->prettifyJson(trim(
             file_get_contents(PathBuilder::build($responseSource, sprintf('%s.%s', $filename, $mimeType)))
-        );
-        $matcher = $this->buildMatcher();
-        $result = $matcher->match($actualResponse, $expectedResponse);
-        if (!$result) {
-            $diff = new \Diff(explode(PHP_EOL, $expectedResponse), explode(PHP_EOL, $actualResponse), []);
-            self::fail($matcher->getError().PHP_EOL.$diff->render(new \Diff_Renderer_Text_Unified()));
+        ));
+
+        $factory = new MatcherFactory();
+        $matcher = $factory->createMatcher();
+        $match = $matcher->match($actualResponse, $expectedResponse);
+        if (!$match) {
+            $actualArray = explode(PHP_EOL, $actualResponse);
+            $expectedArray = explode(PHP_EOL, $expectedResponse);
+
+            $diff = new \Diff($actualArray, $expectedArray, []);
+            self::fail($diff->render(new \Diff_Renderer_Text_Unified()));
         }
     }
 
@@ -102,14 +104,6 @@ trait ExtraAssertsTrait
         }
 
         return $this->expectedResponsesPath;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function buildMatcher()
-    {
-        return MatcherFactory::buildJsonMatcher();
     }
 
     /**

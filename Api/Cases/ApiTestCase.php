@@ -3,11 +3,13 @@
 namespace SoftPassio\ApiTestCasesBundle\Api\Cases;
 
 use Fidry\AliceDataFixtures\Loader\PurgerLoader;
+use Nelmio\Alice\Loader\NativeLoader;
 use Symfony\Bundle\FrameworkBundle\Client;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Finder\Finder;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Common\DataFixtures\Purger\ORMPurger;
 
 class ApiTestCase extends WebTestCase
 {
@@ -25,9 +27,9 @@ class ApiTestCase extends WebTestCase
     protected $expectedResponsesPath;
 
     /**
-     * @var Client
+     * @var array
      */
-    protected static $staticClient;
+    protected $fixutreFiles = [];
 
     /**
      * @var Client
@@ -39,8 +41,7 @@ class ApiTestCase extends WebTestCase
 
     protected function setUp(): void
     {
-        $this->dataFixturesPath = __DIR__.'/../Fixtures/ORM';
-        $this->expectedResponsesPath = __DIR__.'/../Responses/Expected';
+        $this->expectedResponsesPath = $this->getExpectedResponsesFolder();
         $this->client = static::createClient();
 
         $this->setUpDatabase();
@@ -61,40 +62,55 @@ class ApiTestCase extends WebTestCase
     }
 
     /**
-     * @return PurgerLoader
+     * @return Fixtures
      */
-    protected function getFixtureLoader()
+    protected function getFixtureLoader($managerName = null)
     {
-        if (!$this->loader) {
-            $this->loader = self::$container->get('fidry_alice_data_fixtures.loader.doctrine_mongodb');
-        }
+        $loader = new NativeLoader();
 
-        return $this->loader;
+        return $loader;
     }
-    
+
+    protected function addFixtureFiles($source, $managerName = null)
+    {
+        if(!is_array($source)){
+            $source = [$source];
+        }
+        foreach ($source as $item){
+            $source = $this->getFixtureRealPath($item);
+            $this->assertSourceExists($source);
+
+            $this->fixutreFiles[] = $source;
+        }
+    }
+
     /**
      * @param string $source
      *
      * @return array
      */
-    protected function loadFixturesFromFile($source)
+    protected function persistFixtures($managerName = null)
     {
-        $source = $this->getFixtureRealPath($source);
-        $this->assertSourceExists($source);
-
-        return $this->getFixtureLoader()->load([$source]);
+        $objects = $this->getFixtureLoader($managerName)->loadFiles($this->fixutreFiles)->getObjects();
+        foreach ($objects as $object) {
+            $this->getEntityManager()->persist($object);
+        }
+        $this->getEntityManager()->flush();
+        $this->getEntityManager()->clear();
+        $this->fixutreFiles = [];
     }
 
     /**
      * @param string $source
+     *
      * @return array
      */
-    protected function loadFixturesFromDirectory(string $source = '')
+    protected function loadFixturesFromDirectory($source = '', $managerName = null)
     {
         $source = $this->getFixtureRealPath($source);
         $this->assertSourceExists($source);
         $finder = new Finder();
-        $finder->files()->name('*.yaml')->in($source);
+        $finder->files()->name('*.yml')->in($source);
         if (0 === $finder->count()) {
             throw new \RuntimeException(sprintf('There is no files to load in folder %s', $source));
         }
@@ -103,7 +119,7 @@ class ApiTestCase extends WebTestCase
             $files[] = $file->getRealPath();
         }
 
-        return $this->getFixtureLoader()->load($files);
+        return $this->getFixtureLoader($managerName)->loadFiles($files);
     }
 
     private function getFixtureRealPath(string $source): string
@@ -118,10 +134,24 @@ class ApiTestCase extends WebTestCase
         if (null === $this->dataFixturesPath) {
             $this->dataFixturesPath = isset($_SERVER['FIXTURES_DIR']) ?
                 PathBuilder::build($this->getRootDir(), $_SERVER['FIXTURES_DIR']) :
-                PathBuilder::build($this->getCalledClassFolder(), '..', 'Fixtures', 'ORM');
+                PathBuilder::build($this->getCalledClassFolder(), '..', 'DataFixtures', 'ORM');
         }
 
         return $this->dataFixturesPath;
+    }
+
+    /**
+     * @return string
+     */
+    private function getExpectedResponsesFolder(): string
+    {
+        if (null === $this->expectedResponsesPath) {
+            $this->expectedResponsesPath = isset($_SERVER['EXPECTED_RESPONSE_DIR']) ?
+                PathBuilder::build($this->getRootDir(), $_SERVER['EXPECTED_RESPONSE_DIR']) :
+                PathBuilder::build($this->getCalledClassFolder(), '..', 'Responses', 'Expected');
+        }
+
+        return $this->expectedResponsesPath;
     }
 
     /**
@@ -160,6 +190,14 @@ class ApiTestCase extends WebTestCase
     {
         return self::$kernel->getContainer()
             ->get($id);
+    }
+
+    /**
+     * @return RegistryInterface
+     */
+    private function getDoctrine()
+    {
+        return $this->getService('doctrine');
     }
 
     /**
