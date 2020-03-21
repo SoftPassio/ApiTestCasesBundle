@@ -1,6 +1,6 @@
 <?php
 
-namespace AppVerk\ApiTestCasesBundle\Controller;
+namespace SoftPassio\ApiTestCasesBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;

@@ -1,13 +1,13 @@
 <?php
 
-namespace AppVerk\ApiTestCasesBundle\Api\Cases;
+namespace SoftPassio\ApiTestCasesBundle\Api\Cases;
 
-use Doctrine\Common\DataFixtures\Purger\MongoDBPurger;
-use Doctrine\ODM\MongoDB\DocumentManager;
 use Fidry\AliceDataFixtures\Loader\PurgerLoader;
 use Symfony\Bundle\FrameworkBundle\Client;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Finder\Finder;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 
 class ApiTestCase extends WebTestCase
 {
@@ -39,7 +39,7 @@ class ApiTestCase extends WebTestCase
 
     protected function setUp(): void
     {
-        $this->dataFixturesPath = __DIR__.'/../Fixtures/ODM';
+        $this->dataFixturesPath = __DIR__.'/../Fixtures/ORM';
         $this->expectedResponsesPath = __DIR__.'/../Responses/Expected';
         $this->client = static::createClient();
 
@@ -53,8 +53,11 @@ class ApiTestCase extends WebTestCase
 
     private function purgeDatabase(): void
     {
-        $purger = new MongoDBPurger($this->getDocumentManager());
-        $purger->purge();
+        /** @var EntityManagerInterface $manager */
+        foreach ($this->getDoctrine()->getManagers() as $manager) {
+            $purger = new ORMPurger($manager);
+            $purger->purge();
+        }
     }
 
     /**
@@ -67,6 +70,19 @@ class ApiTestCase extends WebTestCase
         }
 
         return $this->loader;
+    }
+    
+    /**
+     * @param string $source
+     *
+     * @return array
+     */
+    protected function loadFixturesFromFile($source)
+    {
+        $source = $this->getFixtureRealPath($source);
+        $this->assertSourceExists($source);
+
+        return $this->getFixtureLoader()->load([$source]);
     }
 
     /**
@@ -102,7 +118,7 @@ class ApiTestCase extends WebTestCase
         if (null === $this->dataFixturesPath) {
             $this->dataFixturesPath = isset($_SERVER['FIXTURES_DIR']) ?
                 PathBuilder::build($this->getRootDir(), $_SERVER['FIXTURES_DIR']) :
-                PathBuilder::build($this->getCalledClassFolder(), '..', 'Fixtures', 'ODM');
+                PathBuilder::build($this->getCalledClassFolder(), '..', 'Fixtures', 'ORM');
         }
 
         return $this->dataFixturesPath;
@@ -140,14 +156,17 @@ class ApiTestCase extends WebTestCase
         }
     }
 
-    private function getDocumentManager(): DocumentManager
-    {
-        return $this->getService('doctrine_mongodb')->getManager();
-    }
-
     protected function getService(string $id)
     {
         return self::$kernel->getContainer()
             ->get($id);
+    }
+
+    /**
+     * @return EntityManager
+     */
+    protected function getEntityManager()
+    {
+        return $this->getService('doctrine.orm.entity_manager');
     }
 }

@@ -6,6 +6,10 @@
     {
       "name": "Michał Jędraszczyk",
       "email": "m.jedrasz@gmail.com"
+    },
+    {
+      "name": "Rafał Narowski",
+      "email": "rafal.narowski@o2.pl"
     }
   ],
   "keywords": [
@@ -18,18 +22,20 @@
   ],
   "require": {
     "php": "^7.2",
-    "symfony/symfony": ">=3.4",
-    "sensio/framework-extra-bundle": "^3.0.2||^5.0.0",
+    "doctrine/doctrine-bundle": "^1.11",
+    "doctrine/data-fixtures": "^1.3",
+    "symfony/symfony": "^3.4||^4.4",
+    "sensio/framework-extra-bundle": "^3.4||^5.0.0",
     "coduo/php-matcher": "*",
-    "hautelook/alice-bundle": "^1.4",
+    "hautelook/alice-bundle": "^2.7",
     "phpspec/php-diff": "^1.1",
-    "phpunit/phpunit": "^8.0",
+    "phpunit/phpunit": "8.0",
     "symfony/phpunit-bridge": "*"
   },
 
   "autoload": {
     "psr-4": {
-      "AppVerk\\ApiTestCasesBundle\\": ""
+      "SoftPassio\\ApiTestCasesBundle\\": ""
     }
   }
 }

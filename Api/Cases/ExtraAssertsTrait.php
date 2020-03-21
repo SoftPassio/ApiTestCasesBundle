@@ -1,11 +1,20 @@
 <?php
 
-namespace AppVerk\ApiTestCasesBundle\Api\Cases;
+namespace SoftPassio\ApiTestCasesBundle\Api\Cases;
 
 use Symfony\Component\HttpFoundation\Response;
 
 trait ExtraAssertsTrait
 {
+    /**
+     * @param Response $response
+     * @param int $statusCode
+     */
+    protected function assertResponseCode(Response $response, $statusCode)
+    {
+        self::assertEquals($statusCode, $response->getStatusCode());
+    }
+
     /**
      * Asserts that response has JSON content.
      * If filename is set, asserts that response content matches the one in given file.
