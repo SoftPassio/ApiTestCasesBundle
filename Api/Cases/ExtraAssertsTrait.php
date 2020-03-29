@@ -6,6 +6,8 @@ use Coduo\PHPMatcher\PHPUnit\PHPMatcherAssertions;
 use Coduo\PHPMatcher\Factory\MatcherFactory;
 use Symfony\Component\HttpFoundation\Response;
 use Coduo\PHPMatcher\PHPMatcher;
+use SebastianBergmann\Diff\Differ;
+use SebastianBergmann\Diff\Output\UnifiedDiffOutputBuilder;
 
 trait ExtraAssertsTrait
 {
@@ -75,9 +77,20 @@ trait ExtraAssertsTrait
         $result = $matcher->match(json_decode($actualResponse, true), json_decode($expectedResponse, true));
 
         if (!$result) {
-            $diff = new \Diff(explode(\PHP_EOL, $expectedResponse), explode(\PHP_EOL, $actualResponse), []);
 
-            self::fail($matcher->getError() . \PHP_EOL . $diff->render(new \Diff_Renderer_Text_Unified()));
+            $differ = new Differ(
+                new UnifiedDiffOutputBuilder(
+                    "Json value is not matching expected format:". \PHP_EOL
+                    .$matcher->getError(). \PHP_EOL,
+                    true
+                )
+            );
+            $diffOutput = $differ->diff(
+                \json_encode(\json_decode($expectedResponse, true), JSON_PRETTY_PRINT),
+                \json_encode(\json_decode($actualResponse, true), JSON_PRETTY_PRINT)
+            );
+
+            self::fail($diffOutput);
         }
     }
 
