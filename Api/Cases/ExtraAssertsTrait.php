@@ -26,7 +26,7 @@ trait ExtraAssertsTrait
      * If statusCode is set, asserts that response has given status code.
      *
      * @param string|null $filename
-     * @param int|null    $statusCode
+     * @param int|null $statusCode
      */
     protected function assertResponse(Response $response, $filename, $statusCode = 200)
     {
@@ -61,23 +61,23 @@ trait ExtraAssertsTrait
      * @param string $filename
      * @param string $mimeType
      */
-    protected function assertResponseContent($actualResponse, $filename, $mimeType)
+    protected function assertResponseContent(string $actualResponse, string $filename, string $mimeType): void
     {
         $responseSource = $this->getExpectedResponsesFolder();
-        $actualResponse = $this->prettifyJson(trim($actualResponse));
-        $expectedResponse = $this->prettifyJson(trim(
-            file_get_contents(PathBuilder::build($responseSource, sprintf('%s.%s', $filename, $mimeType)))
-        ));
 
-        $factory = new MatcherFactory();
-        $matcher = $factory->createMatcher();
-        $match = $matcher->match($actualResponse, $expectedResponse);
-        if (!$match) {
-            $actualArray = explode(PHP_EOL, $actualResponse);
-            $expectedArray = explode(PHP_EOL, $expectedResponse);
+        $contents = file_get_contents(PathBuilder::build($responseSource, sprintf('%s.%s', $filename, $mimeType)));
+        $contents = $this->prettifyJson($contents);
 
-            $diff = new \Diff($actualArray, $expectedArray, []);
-            self::fail($diff->render(new \Diff_Renderer_Text_Unified()));
+        $actualResponse = trim($actualResponse);
+        $expectedResponse = trim($contents);
+
+        $matcher = $this->buildMatcher();
+        $result = $matcher->match(json_decode($actualResponse, true), json_decode($expectedResponse, true));
+
+        if (!$result) {
+            $diff = new \Diff(explode(\PHP_EOL, $expectedResponse), explode(\PHP_EOL, $actualResponse), []);
+
+            self::fail($matcher->getError() . \PHP_EOL . $diff->render(new \Diff_Renderer_Text_Unified()));
         }
     }
 
@@ -111,8 +111,16 @@ trait ExtraAssertsTrait
      *
      * @return string
      */
-    protected function prettifyJson($content)
+    protected function prettifyJson($content): string
     {
-        return json_encode(json_decode($content), JSON_PRETTY_PRINT);
+        $jsonFlags = \JSON_PRETTY_PRINT;
+        if (!isset($_SERVER['ESCAPE_JSON']) || true !== $_SERVER['ESCAPE_JSON']) {
+            $jsonFlags |= \JSON_UNESCAPED_UNICODE | \JSON_UNESCAPED_SLASHES;
+        }
+
+        /** @var string $encodedContent */
+        $encodedContent = json_encode(json_decode($content, true), $jsonFlags);
+
+        return $encodedContent;
     }
 }
