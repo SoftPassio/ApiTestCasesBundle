@@ -80,9 +80,8 @@ class ApiTestCase extends WebTestCase
      */
     protected function getFixtureLoader($managerName = null)
     {
-        $loader = new NativeLoader();
-
-        return $loader;
+        $managerName = ($managerName) ? $managerName : 'fidry_alice_data_fixtures.loader.doctrine';
+        return $this->getService($managerName);
     }
 
     protected function addFixtureFiles($source, $managerName = null)
@@ -105,12 +104,7 @@ class ApiTestCase extends WebTestCase
      */
     protected function persistFixtures($managerName = null)
     {
-        $objects = $this->getFixtureLoader($managerName)->loadFiles($this->fixutreFiles)->getObjects();
-        foreach ($objects as $object) {
-            $this->getEntityManager()->persist($object);
-        }
-        $this->getEntityManager()->flush();
-        $this->getEntityManager()->clear();
+        $objects = $this->getFixtureLoader($managerName)->load($this->fixutreFiles);
         $this->fixutreFiles = [];
     }
 
