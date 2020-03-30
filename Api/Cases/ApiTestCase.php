@@ -10,6 +10,8 @@ use Symfony\Component\Finder\Finder;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Common\DataFixtures\Purger\ORMPurger;
+use Coduo\PHPMatcher\Matcher;
+use Coduo\PHPMatcher\Factory\MatcherFactory;
 
 class ApiTestCase extends WebTestCase
 {
@@ -38,6 +40,18 @@ class ApiTestCase extends WebTestCase
 
     /** @var PurgerLoader */
     private $loader;
+
+    public function __construct($name = null, array $data = [], $dataName = '')
+    {
+        parent::__construct($name, $data, $dataName);
+
+        $this->matcherFactory = new MatcherFactory();
+    }
+
+    protected function buildMatcher(): Matcher
+    {
+        return $this->matcherFactory->createMatcher();
+    }
 
     protected function setUp(): void
     {

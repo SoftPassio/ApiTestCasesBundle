@@ -77,7 +77,7 @@ trait ExtraAssertsTrait
             $expectedArray = explode(PHP_EOL, $expectedResponse);
 
             $diff = new \Diff($actualArray, $expectedArray, []);
-            self::fail($matcher->getError(). \PHP_EOL.$diff->render(new \Diff_Renderer_Text_Unified()));
+            self::fail($diff->render(new \Diff_Renderer_Text_Unified()));
         }
     }
 
