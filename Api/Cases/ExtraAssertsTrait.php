@@ -71,13 +71,13 @@ trait ExtraAssertsTrait
 
         $factory = new MatcherFactory();
         $matcher = $factory->createMatcher();
-        $match = $matcher->match($actualResponse, $expectedResponse);
-        if (!$match) {
+        $result = $matcher->match(json_decode($actualResponse, true), json_decode($expectedResponse, true));
+        if (!$result) {
             $actualArray = explode(PHP_EOL, $actualResponse);
             $expectedArray = explode(PHP_EOL, $expectedResponse);
 
             $diff = new \Diff($actualArray, $expectedArray, []);
-            self::fail($diff->render(new \Diff_Renderer_Text_Unified()));
+            self::fail($matcher->getError(). \PHP_EOL.$diff->render(new \Diff_Renderer_Text_Unified()));
         }
     }
 
