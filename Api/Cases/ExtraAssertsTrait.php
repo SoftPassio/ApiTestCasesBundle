@@ -65,6 +65,7 @@ trait ExtraAssertsTrait
     {
         $responseSource = $this->getExpectedResponsesFolder();
         $actualResponse = $this->prettifyJson(trim($actualResponse));
+
         $expectedResponse = $this->prettifyJson(trim(
             file_get_contents(PathBuilder::build($responseSource, sprintf('%s.%s', $filename, $mimeType)))
         ));

@@ -57,22 +57,12 @@ class ApiTestCase extends WebTestCase
     {
         $this->expectedResponsesPath = $this->getExpectedResponsesFolder();
         $this->client = static::createClient();
-
-        $this->setUpDatabase();
     }
 
-    public function setUpDatabase(): void
+    public function tearDown(): void
     {
-        $this->purgeDatabase();
-    }
-
-    private function purgeDatabase(): void
-    {
-        /** @var EntityManagerInterface $manager */
-        foreach ($this->getDoctrine()->getManagers() as $manager) {
-            $purger = new ORMPurger($manager);
-            $purger->purge();
-        }
+        $purger = new ORMPurger($this->getDoctrine()->getManager());
+        $purger->purge();
     }
 
     /**
@@ -105,6 +95,7 @@ class ApiTestCase extends WebTestCase
     protected function persistFixtures($managerName = null)
     {
         $objects = $this->getFixtureLoader($managerName)->load($this->fixutreFiles);
+        $this->getEntityManager()->clear();
         $this->fixutreFiles = [];
     }
 
