@@ -118,7 +118,7 @@ class ApiTestCase extends WebTestCase
             $files[] = $file->getRealPath();
         }
 
-        return $this->getFixtureLoader($managerName)->loadFiles($files);
+        return $this->getFixtureLoader($managerName)->load($files);
     }
 
     private function getFixtureRealPath(string $source): string
